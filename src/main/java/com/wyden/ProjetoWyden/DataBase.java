@@ -19,9 +19,9 @@ public class DataBase {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost:3306/cadastro");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/dbjava");
         dataSource.setUsername("root");
-        dataSource.setPassword("123456");
+        dataSource.setPassword("$Ak1nz0la1");
         return dataSource;
     }
 

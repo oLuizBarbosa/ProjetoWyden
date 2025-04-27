@@ -20,7 +20,6 @@ public class Cadastro implements Serializable {
     private String email;
     private String grupo;
     private String telefone;
-    private String matricula;
     private String senha;
 
     public long getId() {
@@ -71,11 +70,4 @@ public class Cadastro implements Serializable {
         this.telefone = telefone;
     }
 
-    public String getMatricula() {
-        return matricula;
-    }
-
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
 }
