@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class CadastroController {
-
     @Autowired
     private CadastroRepository cr;
 
@@ -30,7 +29,7 @@ public class CadastroController {
             BindingResult result
     ) {
         if (result.hasErrors()) {
-            return "cadastro/formCadastro"; //
+            return "cadastro/formCadastro";
         }
 
         Cadastro usuario = new Cadastro();

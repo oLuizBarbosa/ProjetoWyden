@@ -1,5 +1,6 @@
 package com.wyden.ProjetoWyden.DTOs;
 
+import jakarta.validation.constraints.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -18,6 +19,8 @@ public class DTO_Cadastro {
     private String senha;
 
     @NotBlank(message = "O telefone é obrigatório")
+    @Pattern(regexp = "^\\(?\\d{2}\\)?[\\s-]?\\d{4,5}[\\s-]?\\d{4}$",
+            message = "Telefone inválido. Use (XX) XXXXX-XXXX")
     @Size(min = 11)
     private String telefone;
 
