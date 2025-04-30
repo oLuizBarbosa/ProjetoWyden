@@ -19,9 +19,9 @@ public class CadastroController {
     }
 
     @PostMapping(value ="/cadastrarUsuario")
-    public String form(Cadastro cadastro){
+    public String form(Cadastro usuario){
 
-        cr.save(cadastro);
+        cr.save(usuario);
 
         return "redirect:/login";
     }

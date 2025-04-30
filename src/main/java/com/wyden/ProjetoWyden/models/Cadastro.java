@@ -1,13 +1,11 @@
 package com.wyden.ProjetoWyden.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 
 @Entity
+@Table(name = "usuarios")
 public class Cadastro implements Serializable {
 
     private static final long serialVersionUID = 1L;
