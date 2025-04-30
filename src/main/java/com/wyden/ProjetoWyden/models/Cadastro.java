@@ -17,7 +17,11 @@ public class Cadastro implements Serializable {
     private String nome;
     private String email;
     private String grupo;
+
+    @Column(length = 11)
     private String telefone;
+
+    @Column(length = 8)
     private String senha;
 
     public long getId() {
