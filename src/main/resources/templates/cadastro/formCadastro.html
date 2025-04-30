@@ -37,26 +37,30 @@
 <div class="card">
     <div class="logo">Cadastre-se</div>
 
-    <form action="/cadastrarUsuario" method="post">
+    <form action="/cadastrarUsuario" method="post" th:object="${DTO_Cadastro}">
         <div class="mb-3">
             <label for="nome" class="form-label">Nome</label>
-            <input type="text" class="form-control" id="nome" name="nome" required placeholder="Seu nome completo">
+            <input type="text" class="form-control" id="nome" th:field="*{nome}" placeholder="Seu nome completo">
+            <small class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">E-mail</label>
-            <input type="email" class="form-control" id="email" name="email" required placeholder="seu@email.com">
+            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="seu@email.com">
+            <small class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
         </div>
         <div class="mb-3">
             <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="senha" name="senha" required placeholder="Crie uma senha segura">
+            <input type="password" class="form-control" id="senha" th:field="*{senha}" placeholder="Crie uma senha segura">
+            <small class="text-danger" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></small>
         </div>
         <div class="mb-3">
             <label for="telefone" class="form-label">Telefone</label>
-            <input type="tel" class="form-control" id="telefone" name="telefone" required placeholder="(00) 00000-0000">
+            <input type="tel" class="form-control" id="telefone" th:field="*{telefone}" placeholder="(00) 00000-0000">
+            <small class="text-danger" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></small>
         </div>
         <div class="mb-3">
             <label for="grupo" class="form-label">Grupo</label>
-            <select class="form-select" id="grupo" th:field="*{grupo}" required>
+            <select class="form-select" id="grupo" th:field="*{grupo}">
                 <option value="" selected disabled>Selecione um grupo</option>
                 <option value="RH - Recursos Humanos">RH - Recursos Humanos</option>
                 <option value="TI - Assistência Tecnologia">TI - Assistência Tecnologia</option>
@@ -69,6 +73,7 @@
             <button type="submit" class="btn btn-primary">Cadastrar</button>
         </div>
     </form>
+
 </div>
 </body>
 </html>
