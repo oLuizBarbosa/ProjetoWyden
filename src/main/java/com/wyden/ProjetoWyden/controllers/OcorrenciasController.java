@@ -1,7 +1,6 @@
 package com.wyden.ProjetoWyden.controllers;
 
-import com.wyden.ProjetoWyden.models.Ocorrencia;
-import com.wyden.ProjetoWyden.repository.OcorrenciasRepository;
+import com.wyden.ProjetoWyden.repository.HomeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class OcorrenciasController {
 
     @Autowired
-    private OcorrenciasRepository or;
+    private HomeRepository or;
 
     @GetMapping("/ocorrencias")
     public String form(){

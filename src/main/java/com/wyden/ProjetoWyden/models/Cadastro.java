@@ -1,17 +1,21 @@
 package com.wyden.ProjetoWyden.models;
 
 import jakarta.persistence.*;
-
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "usuarios")
-public class Cadastro implements Serializable {
+public class Cadastro implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String nome;
@@ -24,6 +28,45 @@ public class Cadastro implements Serializable {
     @Column(length = 100)
     private String senha;
 
+    // Métodos UserDetails
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Converte o grupo do usuário para uma role no formato ROLE_GRUPO
+        String role = "ROLE_" + (this.grupo != null ? this.grupo.toUpperCase() : "USER");
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email; // Usamos email como username
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Conta nunca expira
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true; // Conta nunca é bloqueada
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Credenciais nunca expiram
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Conta sempre ativa
+    }
+
+    // Getters e Setters originais
     public long getId() {
         return id;
     }
@@ -71,5 +114,4 @@ public class Cadastro implements Serializable {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
-
 }

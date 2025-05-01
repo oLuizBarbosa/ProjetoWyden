@@ -16,7 +16,7 @@ public class Comentario {
     private LocalDateTime dataCriacao;
 
     @ManyToOne
-    private Ocorrencia ocorrencia;
+    private Home ocorrencia;
 
     @ManyToOne
     private Cadastro usuario; // Quem fez o comentário
@@ -46,11 +46,11 @@ public class Comentario {
         this.dataCriacao = dataCriacao;
     }
 
-    public Ocorrencia getOcorrencia() {
+    public Home getOcorrencia() {
         return ocorrencia;
     }
 
-    public void setOcorrencia(Ocorrencia ocorrencia) {
+    public void setOcorrencia(Home ocorrencia) {
         this.ocorrencia = ocorrencia;
     }
 
