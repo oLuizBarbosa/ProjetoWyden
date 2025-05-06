@@ -1,5 +1,6 @@
 package com.wyden.ProjetoWyden.controllers;
 
+import com.wyden.ProjetoWyden.DTOs.HomeDTO;
 import com.wyden.ProjetoWyden.repository.OcorrenciaRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -18,7 +19,12 @@ public class HomeController {
     @GetMapping("/home")
     public String home(Authentication authentication, Model model) {
         String email = authentication.getName();
-        model.addAttribute("ocorrencias", ocorrenciaRepository.findByUsuarioEmail(email));
+
+        HomeDTO homeDTO = new HomeDTO();
+        homeDTO.setNomeUsuario(email);
+        homeDTO.setOcorrencias(ocorrenciaRepository.findByUsuarioEmail(email));
+
+        model.addAttribute("homeDTO", homeDTO);
         return "home";
     }
 }

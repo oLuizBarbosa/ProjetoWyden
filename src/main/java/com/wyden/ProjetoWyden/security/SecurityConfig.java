@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -24,18 +25,25 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**"
                         ).permitAll()
+                        .requestMatchers("/Home").authenticated()  // Garante que /home requer autenticação
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
+                        .defaultSuccessUrl("/Home", true)  // Redireciona para /home após login
+                        .failureUrl("/login?error=true")   // Em caso de falha
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/login?logout")  // Redireciona após logout
+                        .invalidateHttpSession(true)        // Invalida a sessão
+                        .deleteCookies("JSESSIONID")       // Remove cookies
                         .permitAll()
+                )
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .expiredUrl("/login?expired")      // Para sessões expiradas
                 );
 
         return http.build();

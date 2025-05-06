@@ -83,21 +83,21 @@
 <div class="sidebar">
     <div class="user-profile">
         <img src="/images/profile-placeholder.png" th:src="@{/images/profile-placeholder.png}" class="profile-img" alt="Foto de perfil">
-        <h5 th:text="${'Olá, ' + #authentication.principal.nome}" style="color: #4364f7;">Olá, Usuário</h5>
+        <h5 th:text="${'Olá, ' + HomeDTO.nomeUsuario}" style="color: #4364f7;">Olá, Usuário</h5>
         <p class="text-muted mb-0" th:text="${#authentication.principal.grupo}">Perfil</p>
     </div>
 
     <nav class="nav flex-column p-2">
-        <a class="nav-link active" href="#">
+        <a class="nav-link active" th:href="@{/home}">
             <i class="bi bi-house-door"></i> Home
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" th:href="@{/meus-chamados}">
             <i class="bi bi-ticket-detailed"></i> Meus Chamados
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" th:href="@{/novo-chamado}">
             <i class="bi bi-plus-circle"></i> Novo Chamado
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" th:href="@{/configuracoes}">
             <i class="bi bi-gear"></i> Configurações
         </a>
         <a class="nav-link" th:href="@{/logout}">
@@ -109,7 +109,7 @@
 <!-- Conteúdo Principal -->
 <div class="main-content">
     <div class="container-fluid">
-        <h2 class="mb-4" th:text="${'Bem-vindo, ' + #authentication.principal.nome + '!'}">Bem-vindo!</h2>
+        <h2 class="mb-4" th:text="${'Bem-vindo, ' + HomeDTO.nomeUsuario + '!'}">Bem-vindo!</h2>
 
         <!-- Lista de Chamados -->
         <div class="card">
@@ -117,21 +117,22 @@
                 <h4 class="mb-0">Meus Chamados</h4>
             </div>
             <div class="card-body">
-                <div th:if="${chamados.empty}">
+                <div th:if="${HomeDTO.ocorrencias.empty}">
                     <div class="alert alert-info">Nenhum chamado encontrado.</div>
                 </div>
 
-                <div th:each="chamado : ${chamados}" class="card chamado-card mb-3">
+                <div th:each="chamado : ${HomeDTO.ocorrencias}" class="card chamado-card mb-3">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
                             <h5 th:text="${chamado.titulo}" style="color: #4364f7;">Título do Chamado</h5>
-                            <span class="badge" th:classappend="${chamado.status == 'Aberto'} ? 'bg-warning' : 'bg-success'"
+                            <span class="badge" th:classappend="${chamado.status == 'ABERTA'} ? 'bg-warning' :
+                                                              (chamado.status == 'FECHADA') ? 'bg-success' : 'bg-info'"
                                   th:text="${chamado.status}">Status</span>
                         </div>
                         <p class="text-muted mt-2" th:text="${chamado.descricao}">Descrição do chamado...</p>
                         <div class="d-flex justify-content-between mt-3">
-                            <small class="text-muted" th:text="${'Criado em: ' + #temporals.format(chamado.dataCriacao, 'dd/MM/yyyy')}">Data: 01/01/2023</small>
-                            <a href="#" class="btn btn-sm btn-outline-primary">Detalhes</a>
+                            <small class="text-muted" th:text="${'Criado em: ' + #temporals.format(chamado.dataAbertura, 'dd/MM/yyyy')}">Data: 01/01/2023</small>
+                            <a th:href="@{'/detalhes-chamado/' + ${chamado.id}}" class="btn btn-sm btn-outline-primary">Detalhes</a>
                         </div>
                     </div>
                 </div>
