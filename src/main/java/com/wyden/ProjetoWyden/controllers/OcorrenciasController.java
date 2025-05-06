@@ -13,7 +13,7 @@ public class OcorrenciasController {
 
     @GetMapping("/ocorrencias")
     public String form(){
-        return "Tela principal/tela_de_ocorrencias";
+        return "criar_ocorrencia";
     }
 
 }
