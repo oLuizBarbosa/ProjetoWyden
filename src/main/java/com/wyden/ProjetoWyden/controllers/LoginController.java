@@ -35,6 +35,6 @@ public class LoginController {
     public String processLogin(LoginDTO loginDTO) {
         // A autenticação real é tratada pelo Spring Security
         // Este método só redireciona após o sucesso
-        return "redirect:/home";
+        return "redirect:/Home";
     }
 }

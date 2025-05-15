@@ -16,7 +16,7 @@ public class HomeController {
         this.ocorrenciaRepository = ocorrenciaRepository;
     }
 
-    @GetMapping("/home")
+    @GetMapping("/Home")
     public String home(Authentication authentication, Model model) {
         String email = authentication.getName();
 
@@ -24,7 +24,7 @@ public class HomeController {
         homeDTO.setNomeUsuario(email);
         homeDTO.setOcorrencias(ocorrenciaRepository.findByUsuarioEmail(email));
 
-        model.addAttribute("homeDTO", homeDTO);
-        return "home";
+        model.addAttribute("HomeDTO", homeDTO);
+        return "/Home";
     }
 }

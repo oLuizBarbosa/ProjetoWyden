@@ -88,7 +88,7 @@
     </div>
 
     <nav class="nav flex-column p-2">
-        <a class="nav-link active" th:href="@{/home}">
+        <a class="nav-link active" th:href="@{/Home}">
             <i class="bi bi-house-door"></i> Home
         </a>
         <a class="nav-link" th:href="@{/meus-chamados}">
@@ -117,7 +117,7 @@
                 <h4 class="mb-0">Meus Chamados</h4>
             </div>
             <div class="card-body">
-                <div th:if="${HomeDTO.ocorrencias.empty}">
+                <div th:if="${homeDTO.ocorrencias.empty}">
                     <div class="alert alert-info">Nenhum chamado encontrado.</div>
                 </div>
 
