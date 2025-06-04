@@ -20,7 +20,9 @@ public class CadastroService {
 
     @Transactional
     public Cadastro criar(Cadastro cadastro) {
-        cadastro.setSenha(passwordEncoder.encode(cadastro.getSenha()));
+        String senhaHash = passwordEncoder.encode(cadastro.getSenha());
+        System.out.println("Senha hasheada: " + senhaHash); // Log para verificação
+        cadastro.setSenha(senhaHash);
         return repository.save(cadastro);
     }
 
@@ -37,4 +39,5 @@ public class CadastroService {
     public List<Object[]> relatorioUsuariosPorGrupo() {
         return repository.countUsersByGroup();
     }
+
 }

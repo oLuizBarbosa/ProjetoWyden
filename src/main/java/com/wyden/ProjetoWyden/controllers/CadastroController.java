@@ -26,7 +26,8 @@ public class CadastroController {
     @GetMapping("/novo")
     public String mostrarForm(Model model) {
         model.addAttribute("cadastroDTO", new CadastroDTO());
-        model.addAttribute("gruposDisponiveis", Role.values()); // Para o select no Thymeleaf
+        model.addAttribute("gruposDisponiveis", Role.values()); // Para o select
+        model.addAttribute("fieldErrors", null); // Adicionado para evitar null pointer no FTL
         return "cadastros/form";
     }
 
@@ -34,15 +35,24 @@ public class CadastroController {
     public String cadastrar(
             @Valid @ModelAttribute("cadastroDTO") CadastroDTO dto,
             BindingResult result,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (result.hasErrors()) {
+            model.addAttribute("fieldErrors", result.getFieldErrors()); // Mapeia erros para o FTL
+
+            return "cadastros/form";
+        }
+
+        if (dto.getGrupo() == null) {
+            result.rejectValue("grupo", "grupo.vazio", "Selecione um tipo de usuário");
             return "cadastros/form";
         }
 
         // Verifica se email já existe
         if (cadastroRepository.existsByEmail(dto.getEmail())) {
             result.rejectValue("email", "email.duplicado", "Email já cadastrado");
+
             return "cadastros/form";
         }
 
