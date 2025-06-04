@@ -17,12 +17,15 @@ import jakarta.validation.Valid;
 public class OcorrenciaController {
 
     @Autowired
-    private OcorrenciaRepository ocorrenciaRepository;
+    private OcorrenciaRepository repository;
 
     @GetMapping("/nova")
     public String mostrarForm(Model model) {
-        model.addAttribute("ocorrenciaDTO", new OcorrenciaDTO());
+        OcorrenciaDTO dto = new OcorrenciaDTO();
+        dto.setStatus(Ocorrencia.Status.ABERTO); // Status padrão
+        model.addAttribute("ocorrenciaDTO", dto);
         model.addAttribute("prioridades", Ocorrencia.Prioridade.values());
+        model.addAttribute("fieldErrors", null); // Evita null pointer no FTL
         return "ocorrencias/form";
     }
 
@@ -31,9 +34,12 @@ public class OcorrenciaController {
             @Valid @ModelAttribute("ocorrenciaDTO") OcorrenciaDTO dto,
             BindingResult result,
             @AuthenticationPrincipal Cadastro usuarioLogado,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
         if (result.hasErrors()) {
+            model.addAttribute("prioridades", Ocorrencia.Prioridade.values());
+            model.addAttribute("fieldErrors", result.getFieldErrors());
             return "ocorrencias/form";
         }
 
@@ -41,20 +47,20 @@ public class OcorrenciaController {
         ocorrencia.setTitulo(dto.getTitulo());
         ocorrencia.setDescricao(dto.getDescricao());
         ocorrencia.setPrioridade(dto.getPrioridade());
-        ocorrencia.setUsuario(usuarioLogado); // Associa automaticamente
+        ocorrencia.setUsuario(usuarioLogado);
 
-        ocorrenciaRepository.save(ocorrencia);
+        repository.save(ocorrencia);
 
-        redirectAttributes.addFlashAttribute(
-                "sucesso",
+        redirectAttributes.addFlashAttribute("sucesso",
                 "Ocorrência #" + ocorrencia.getId() + " criada com sucesso!");
 
         return "redirect:/ocorrencias";
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("ocorrencias", ocorrenciaRepository.findAll());
-        return "ocorrencias/lista";
+    public String listar(Model model, @AuthenticationPrincipal Cadastro usuarioLogado) {
+        model.addAttribute("ocorrencias", repository.findAll());
+        model.addAttribute("usuarioLogado", usuarioLogado); // Para exibir no sidebar
+        return "ocorrencias/list";
     }
 }
