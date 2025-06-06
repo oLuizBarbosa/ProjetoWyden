@@ -1,6 +1,5 @@
 <#ftl output_format="HTML" auto_esc=true>
 <!DOCTYPE html>
-<#-- formCadastro.ftl -->
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">

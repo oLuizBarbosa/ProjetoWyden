@@ -1,5 +1,3 @@
-<#ftl output_format="HTML" auto_esc=true>
-<!DOCTYPE html>
 <#-- formLogin.ftl -->
 <html lang="pt-BR">
 <head>
@@ -55,18 +53,14 @@
     </#if>
 
     <form action="/login" method="post">
-        <#if _csrf??>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-        </#if>
 
         <div class="mb-3">
             <label for="email" class="form-label">E-mail</label>
-            <input type="email" class="form-control" name="username" required placeholder="seu@email.com">
         </div>
 
         <div class="mb-4">
             <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" name="password" required placeholder="Sua senha">
         </div>
 
         <div class="d-grid gap-2 mb-3">

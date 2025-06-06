@@ -1,4 +1,3 @@
-<#ftl output_format="HTML" auto_esc=true>
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
