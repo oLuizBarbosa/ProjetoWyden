@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.cadastroRepository = cadastroRepository;
     }
 
-    // Método obrigatório que busca o usuário pelo username (no seu caso, email)
+    // Metodo obrigatório que busca o usuário pelo username (no seu caso, email)
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         // Log de tentativa de login (nível INFO)
