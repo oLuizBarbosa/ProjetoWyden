@@ -1,49 +1,63 @@
 package com.wyden.ProjetoWyden.controllers;
 
-import com.wyden.ProjetoWyden.DTOs.DTO_Cadastro;
+import com.wyden.ProjetoWyden.DTOs.CadastroDTO;
 import com.wyden.ProjetoWyden.models.Cadastro;
+import com.wyden.ProjetoWyden.models.Cadastro.Role;
 import com.wyden.ProjetoWyden.repository.CadastroRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping("/cadastros")
 public class CadastroController {
-    @Autowired
-    private CadastroRepository cr;
 
-    @GetMapping("/cadastrarUsuario")
-    public String form(Model model) {
-        model.addAttribute("DTO_Cadastro", new DTO_Cadastro());
-        return "cadastro/formCadastro";
+    @Autowired
+    private CadastroRepository cadastroRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @GetMapping("/novo")
+    public String mostrarForm(Model model) {
+        model.addAttribute("cadastroDTO", new CadastroDTO());
+        model.addAttribute("gruposDisponiveis", Role.values()); // Para o select no Thymeleaf
+        return "cadastros/form";
     }
 
-    @PostMapping("/cadastrarUsuario")
-    public String salvarUsuario(
-            @Valid @ModelAttribute("DTO_Cadastro") DTO_Cadastro DTOCadastro,
+    @PostMapping
+    public String cadastrar(
+            @Valid @ModelAttribute("cadastroDTO") CadastroDTO dto,
             BindingResult result,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
+
         if (result.hasErrors()) {
-            return "cadastro/formCadastro";
+            return "cadastros/form";
+        }
+
+        // Verifica se email já existe
+        if (cadastroRepository.existsByEmail(dto.getEmail())) {
+            result.rejectValue("email", "email.duplicado", "Email já cadastrado");
+            return "cadastros/form";
         }
 
         Cadastro usuario = new Cadastro();
-        usuario.setNome(DTOCadastro.getNome());
-        usuario.setEmail(DTOCadastro.getEmail());
-        usuario.setSenha(DTOCadastro.getSenha());
-        usuario.setTelefone(DTOCadastro.getTelefone());
-        usuario.setGrupo(DTOCadastro.getGrupo());
+        usuario.setNome(dto.getNome());
+        usuario.setEmail(dto.getEmail());
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha())); // Criptografa senha
+        usuario.setGrupo(dto.getGrupo());
+        usuario.setTelefone(dto.getTelefone());
 
-        cr.save(usuario);
+        cadastroRepository.save(usuario);
 
-        redirectAttributes.addFlashAttribute("sucesso", "Usuário cadastrado com sucesso!");
+        redirectAttributes.addFlashAttribute(
+                "sucesso",
+                "Usuário " + usuario.getNome() + " cadastrado com sucesso!");
 
         return "redirect:/login";
     }

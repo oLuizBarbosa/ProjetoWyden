@@ -1,31 +1,63 @@
 package com.wyden.ProjetoWyden.DTOs;
 
+import com.wyden.ProjetoWyden.models.Cadastro.Role;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class LoginResponseDTO {
-    private String token;
+    // Getters e Setters
+    private TokenDTO token;
+    private UsuarioInfoDTO usuario;
     private String redirectUrl;
 
     // Construtores
     public LoginResponseDTO() {}
 
-    public LoginResponseDTO(String token, String redirectUrl) {
+    public LoginResponseDTO(TokenDTO token, UsuarioInfoDTO usuario, String redirectUrl) {
         this.token = token;
+        this.usuario = usuario;
         this.redirectUrl = redirectUrl;
     }
 
-    // Getters e Setters
-    public String getToken() {
-        return token;
+    // Inner Class para o Token
+
+    public static class TokenDTO {
+        // Getters
+        private String accessToken;
+        private String tokenType;
+        private long expiresIn;
+
+        public TokenDTO(String accessToken, String tokenType, long expiresIn) {
+            this.accessToken = accessToken;
+            this.tokenType = tokenType;
+            this.expiresIn = expiresIn;
+        }
+
+        public String getAccessToken() {
+            return accessToken;
+        }
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+
+        public String getTokenType() {
+            return tokenType;
+        }
+
+        public void setTokenType(String tokenType) {
+            this.tokenType = tokenType;
+        }
+
+        public long getExpiresIn() {
+            return expiresIn;
+        }
+
+        public void setExpiresIn(long expiresIn) {
+            this.expiresIn = expiresIn;
+        }
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getRedirectUrl() {
-        return redirectUrl;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
-    }
 }

@@ -1,64 +1,50 @@
 package com.wyden.ProjetoWyden.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
+
 
 @Entity
 public class Comentario {
 
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
+    @Setter
+    @NotBlank
     @Column(columnDefinition = "TEXT")
     private String texto;
 
+    @Getter
+    @Setter
+    @NotNull
+    @Column(updatable = false)
     private LocalDateTime dataCriacao;
 
+    @Getter
+    @Setter
+    @NotNull
     @ManyToOne
-    private Home ocorrencia;
+    @JoinColumn(name = "ocorrencia_id", nullable = false)
+    private Ocorrencia ocorrencia;
 
+    @Getter
+    @Setter
+    @NotNull
     @ManyToOne
-    private Cadastro usuario; // Quem fez o comentário
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Cadastro usuario;
 
-    //Getters e Setters
-    public Long getId() {
-        return id;
+    @PrePersist
+    protected void onCreate() {
+        this.dataCriacao = LocalDateTime.now();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTexto() {
-        return texto;
-    }
-
-    public void setTexto(String texto) {
-        this.texto = texto;
-    }
-
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
-    }
-
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
-    }
-
-    public Home getOcorrencia() {
-        return ocorrencia;
-    }
-
-    public void setOcorrencia(Home ocorrencia) {
-        this.ocorrencia = ocorrencia;
-    }
-
-    public Cadastro getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Cadastro usuario) {
-        this.usuario = usuario;
-    }
 }
