@@ -1,26 +1,29 @@
 package com.wyden.ProjetoWyden.controllers;
 
 import com.wyden.ProjetoWyden.DTOs.ComentarioDTO;
-import com.wyden.ProjetoWyden.models.*;
-import com.wyden.ProjetoWyden.repository.ComentarioRepository;
-import com.wyden.ProjetoWyden.repository.OcorrenciaRepository;
+import com.wyden.ProjetoWyden.models.Comentario;
+import com.wyden.ProjetoWyden.models.Ocorrencia;
+import com.wyden.ProjetoWyden.services.ComentarioService;
+import com.wyden.ProjetoWyden.services.OcorrenciaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import jakarta.validation.Valid;
+import com.wyden.ProjetoWyden.models.Cadastro;
 
 @Controller
 @RequestMapping("/comentarios")
 public class ComentarioController {
+    private final ComentarioService comentarioService;
+    private final OcorrenciaService ocorrenciaService;
 
-    @Autowired
-    private ComentarioRepository comentarioRepository;
-
-    @Autowired
-    private OcorrenciaRepository ocorrenciaRepository;
+    public ComentarioController(ComentarioService comentarioService, OcorrenciaService ocorrenciaService) {
+        this.comentarioService = comentarioService;
+        this.ocorrenciaService = ocorrenciaService;
+    }
 
     @PostMapping
     public String criar(
@@ -30,23 +33,20 @@ public class ComentarioController {
             RedirectAttributes redirectAttributes) {
 
         if (result.hasErrors()) {
-            return "redirect:/ocorrencias/" + dto.getOcorrenciaId(); // Volta para a ocorrência
+            return "redirect:/ocorrencias/" + dto.getOcorrenciaId();
         }
+
+        // Modificação aqui: usar orElseThrow() para tratar Optional<Ocorrencia>
+        Ocorrencia ocorrencia = ocorrenciaService.buscarPorId(dto.getOcorrenciaId())
+                .orElseThrow(() -> new IllegalArgumentException("Ocorrência não encontrada"));
 
         Comentario comentario = new Comentario();
         comentario.setTexto(dto.getTexto());
         comentario.setUsuario(usuarioLogado);
-
-        Ocorrencia ocorrencia = ocorrenciaRepository.findById(dto.getOcorrenciaId())
-                .orElseThrow(() -> new IllegalArgumentException("Ocorrência inválida"));
         comentario.setOcorrencia(ocorrencia);
 
-        comentarioRepository.save(comentario);
-
-        redirectAttributes.addFlashAttribute(
-                "sucesso",
-                "Comentário adicionado!");
-
+        comentarioService.criar(comentario);
+        redirectAttributes.addFlashAttribute("sucesso", "Comentário adicionado com sucesso!");
         return "redirect:/ocorrencias/" + dto.getOcorrenciaId();
     }
 }

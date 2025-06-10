@@ -8,23 +8,11 @@ import java.util.List;
 
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
-    // Busca comentários de uma ocorrência específica
+    // Consulta única ordenada por data
     @Query("SELECT c FROM Comentario c WHERE c.ocorrencia.id = :ocorrenciaId ORDER BY c.dataCriacao DESC")
     List<Comentario> findByOcorrenciaId(@Param("ocorrenciaId") Long ocorrenciaId);
 
-    // Contagem de comentários por ocorrência (útil para relatórios)
-    @Query("SELECT COUNT(c) FROM Comentario c WHERE c.ocorrencia.id = :ocorrenciaId")
-    Long countByOcorrenciaId(@Param("ocorrenciaId") Long ocorrenciaId);
-
-    @Query("""
-        SELECT 
-            u.nome as usuario,
-            COUNT(c) as totalComentarios,
-            MAX(c.dataCriacao) as ultimaAtividade
-        FROM Comentario c
-        JOIN c.usuario u
-        GROUP BY u.nome
-        ORDER BY totalComentarios DESC
-        """)
-    List<Object[]> countComentariosByUsuario();
+    // Contagem simples de comentários por usuário (para dashboard)
+    @Query("SELECT c.usuario.nome, COUNT(c) FROM Comentario c GROUP BY c.usuario.nome")
+    List<Object[]> contarComentariosPorUsuario();
 }

@@ -3,30 +3,31 @@ package com.wyden.ProjetoWyden.controllers;
 import com.wyden.ProjetoWyden.DTOs.CadastroDTO;
 import com.wyden.ProjetoWyden.models.Cadastro;
 import com.wyden.ProjetoWyden.models.Cadastro.Role;
-import com.wyden.ProjetoWyden.repository.CadastroRepository;
+import com.wyden.ProjetoWyden.services.CadastroService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/cadastros")
 public class CadastroController {
+    private final CadastroService cadastroService;
 
-    @Autowired
-    private CadastroRepository cadastroRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    public CadastroController(CadastroService cadastroService) {
+        this.cadastroService = cadastroService;
+    }
 
     @GetMapping("/novo")
     public String mostrarForm(Model model) {
         model.addAttribute("cadastroDTO", new CadastroDTO());
-        model.addAttribute("gruposDisponiveis", Role.values()); // Para o select no Thymeleaf
+        model.addAttribute("gruposDisponiveis", Role.values());
+        model.addAttribute("fieldErrors", new HashMap<>());
         return "cadastros/form";
     }
 
@@ -34,31 +35,30 @@ public class CadastroController {
     public String cadastrar(
             @Valid @ModelAttribute("cadastroDTO") CadastroDTO dto,
             BindingResult result,
-            RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes,
+            Model model) {
 
-        if (result.hasErrors()) {
+        if (result.hasErrors() || dto.getGrupo() == null) {
+            model.addAttribute("gruposDisponiveis", Role.values());
             return "cadastros/form";
         }
 
-        // Verifica se email já existe
-        if (cadastroRepository.existsByEmail(dto.getEmail())) {
-            result.rejectValue("email", "email.duplicado", "Email já cadastrado");
+        try {
+            Cadastro novoCadastro = dto.toEntity();
+            // Garante que a senha está sendo passada
+            novoCadastro.setSenha(dto.getSenha());
+            cadastroService.criar(novoCadastro);
+            redirectAttributes.addFlashAttribute("sucesso", "Usuário cadastrado com sucesso!");
+            return "redirect:/login";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("erro", e.getMessage());
+            model.addAttribute("gruposDisponiveis", Role.values());
+            return "cadastros/form";
+        } catch (ResponseStatusException e) {
+            model.addAttribute("erro", e.getReason());
+            model.addAttribute("gruposDisponiveis", Role.values());
+            model.addAttribute("cadastroDTO", dto);
             return "cadastros/form";
         }
-
-        Cadastro usuario = new Cadastro();
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        usuario.setSenha(passwordEncoder.encode(dto.getSenha())); // Criptografa senha
-        usuario.setGrupo(dto.getGrupo());
-        usuario.setTelefone(dto.getTelefone());
-
-        cadastroRepository.save(usuario);
-
-        redirectAttributes.addFlashAttribute(
-                "sucesso",
-                "Usuário " + usuario.getNome() + " cadastrado com sucesso!");
-
-        return "redirect:/login";
     }
 }

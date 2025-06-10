@@ -1,7 +1,6 @@
 package com.wyden.ProjetoWyden.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -9,105 +8,85 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
+@Getter @Setter
 public class Cadastro implements UserDetails, Serializable {
-
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public enum Role {
         ADMIN, USER, SUPPORT;
 
-        public String getPrefixedRole() {
+        public String getAuthority() {
             return "ROLE_" + this.name();
         }
     }
 
-    // Getters e Setters
-    @Setter
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Getter
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank @Size(max = 100)
     @Column(nullable = false)
     private String nome;
 
-    @Setter
-    @Getter
-    @NotBlank
-    @Email
+    @NotBlank @Email
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @Setter
-    @Getter
     @NotBlank
-    @Size(min = 6, max = 100)
-    @JsonProperty(access = Access.WRITE_ONLY)
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false)
     private Role grupo;
 
-    @Setter
-    @Getter
     @Size(min = 11, max = 11)
-    @Column(length = 11)
+    @Pattern(regexp = "\\d{11}", message = "Telefone deve conter 11 dígitos")
     private String telefone;
 
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    @Column(nullable = false)
+    private boolean bloqueado = false;
+
+    // UserDetails methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(grupo.getPrefixedRole()));
+        return List.of(new SimpleGrantedAuthority(grupo.getAuthority()));
     }
 
     @Override
-    public String getPassword() {
-        return this.senha;
-    }
+    public String getPassword() { return this.senha; }
 
     @Override
-    public String getUsername() {
-        return this.email; // Usamos email como username
-    }
+    public String getUsername() { return this.email; }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true; // Conta nunca expira
-    }
+    public boolean isAccountNonExpired() { return this.ativo; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true; // Conta nunca é bloqueada
-    }
+    public boolean isAccountNonLocked() { return this.ativo; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // Credenciais nunca expiram
-    }
+    public boolean isCredentialsNonExpired() { return this.ativo; }
 
     @Override
-    public boolean isEnabled() {
-        return true; // Conta sempre ativa
-    }
+    public boolean isEnabled() { return this.ativo; }
 
-    public @NotNull Role getGrupo() {
-        return grupo;
+    // Métodos auxiliares
+    public boolean isAdmin() {
+        return this.grupo == Role.ADMIN;
     }
-
-    public void setGrupo(@NotNull Role grupo) {
-        this.grupo = grupo;
-    }
-
 }
