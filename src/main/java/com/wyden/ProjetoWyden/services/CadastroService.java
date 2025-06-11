@@ -2,42 +2,49 @@ package com.wyden.ProjetoWyden.services;
 
 import com.wyden.ProjetoWyden.models.Cadastro;
 import com.wyden.ProjetoWyden.repository.CadastroRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CadastroService {
 
     private final CadastroRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public CadastroService(CadastroRepository repository, PasswordEncoder passwordEncoder) {
-        this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Transactional
     public Cadastro criar(Cadastro cadastro) {
-        String senhaHash = passwordEncoder.encode(cadastro.getSenha());
-        System.out.println("Senha hasheada: " + senhaHash); // Log para verificação
-        cadastro.setSenha(senhaHash);
+        if (cadastro.getSenha() == null || cadastro.getSenha().isBlank()) {
+            throw new IllegalArgumentException("Senha não pode ser vazia");
+        }
+
+        if (repository.existsByEmail(cadastro.getEmail())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email já cadastrado");
+        }
+
+        cadastro.setSenha(passwordEncoder.encode(cadastro.getSenha()));
         return repository.save(cadastro);
     }
 
-    public List<Cadastro> buscarTodos() {
-        return repository.findAll();
+    @Transactional
+    public void atualizarSenha(Long usuarioId, String novaSenha) {
+        if (novaSenha == null || novaSenha.length() < 6) {
+            throw new IllegalArgumentException("Senha inválida");
+        }
+
+        repository.findById(usuarioId).ifPresent(usuario -> {
+            usuario.setSenha(passwordEncoder.encode(novaSenha));
+            repository.save(usuario);
+        });
     }
 
-    public Cadastro buscarPorEmail(String email) {
-        return repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    public Optional<Cadastro> buscarPorEmail(String email) {
+        return repository.findByEmail(email);
     }
-
-    // Consulta customizada para relatório de usuários por grupo
-    public List<Object[]> relatorioUsuariosPorGrupo() {
-        return repository.countUsersByGroup();
-    }
-
 }

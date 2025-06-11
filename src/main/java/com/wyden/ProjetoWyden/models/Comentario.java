@@ -2,43 +2,34 @@ package com.wyden.ProjetoWyden.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-
 @Entity
+@Getter @Setter
 public class Comentario {
-
-    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
-    @Setter
     @NotBlank
-    @Column(columnDefinition = "TEXT")
+    @Size(max = 500)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String texto;
 
-    @Getter
-    @Setter
-    @NotNull
-    @Column(updatable = false)
+    @Setter(AccessLevel.NONE)
+    @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
-    @Getter
-    @Setter
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ocorrencia_id", nullable = false)
     private Ocorrencia ocorrencia;
 
-    @Getter
-    @Setter
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Cadastro usuario;
 
@@ -47,4 +38,8 @@ public class Comentario {
         this.dataCriacao = LocalDateTime.now();
     }
 
+    // Metodo auxiliar para DTO
+    public String getNomeUsuario() {
+        return this.usuario != null ? this.usuario.getNome() : "Anônimo";
+    }
 }

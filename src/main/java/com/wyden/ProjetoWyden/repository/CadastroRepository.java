@@ -2,24 +2,33 @@ package com.wyden.ProjetoWyden.repository;
 
 import com.wyden.ProjetoWyden.models.Cadastro;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.relation.Role;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CadastroRepository extends JpaRepository<Cadastro, Long> {
 
-    // Busca por email (usado no login)
     Optional<Cadastro> findByEmail(String email);
 
-    // Verifica se email já existe (usado na validação)
     boolean existsByEmail(String email);
 
-    // Busca por grupo (pode ser útil para autorização)
-    List<Cadastro> findByGrupo(Cadastro.Role grupo);
+    @Query("SELECT c FROM Cadastro c WHERE c.grupo = :grupo")
+    List<Cadastro> findByGrupo(@Param("grupo") Role grupo);
 
-    @Query("SELECT c.grupo as grupo, COUNT(c) as total FROM Cadastro c GROUP BY c.grupo")
-    List<Object[]> countUsersByGroup();
+    // Método para atualização de senha
+    @Modifying
+    @Transactional
+    @Query("UPDATE Cadastro c SET c.senha = :novaSenha WHERE c.id = :usuarioId")
+    int atualizarSenha(@Param("usuarioId") Long usuarioId, @Param("novaSenha") String novaSenha);
+
+    // Consulta para contagem de usuários por grupo (simplificada)
+    @Query("SELECT c.grupo, COUNT(c) FROM Cadastro c GROUP BY c.grupo")
+    List<Object[]> contarUsuariosPorGrupo();
 }

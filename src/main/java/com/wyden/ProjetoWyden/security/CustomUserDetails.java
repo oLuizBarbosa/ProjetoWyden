@@ -1,56 +1,63 @@
 package com.wyden.ProjetoWyden.security;
 
 import com.wyden.ProjetoWyden.models.Cadastro;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
+    private final Cadastro usuario;
 
-    private final Cadastro cadastro; // Sua entidade
-
-    public CustomUserDetails(Cadastro cadastro) {
-        this.cadastro = cadastro;
+    public CustomUserDetails(Cadastro usuario) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não pode ser nulo");
+        }
+        this.usuario = usuario;
     }
 
-    // Mapeia as roles (grupos) para o formato que o Spring Security entende
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + cadastro.getGrupo().name())
+                new SimpleGrantedAuthority(usuario.getGrupo().getAuthority())
         );
     }
 
-    // ---- Métodos obrigatórios (delegate para a entidade Cadastro) ----
+    public Cadastro getUsuario() {
+        return this.usuario;
+    }
+
     @Override
     public String getPassword() {
-        return cadastro.getSenha(); // Já criptografada
+        return usuario.getSenha();
     }
 
     @Override
     public String getUsername() {
-        return cadastro.getEmail(); // Usamos email como username
+        return usuario.getEmail();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Pode implementar lógica se necessário
+        return true; // Pode ser customizado (ex: verificar data de expiração)
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Pode implementar lógica se necessário
+        return !usuario.isBloqueado();
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Pode implementar lógica se necessário
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Pode implementar lógica se necessário
+        return usuario.isAtivo();
     }
 }

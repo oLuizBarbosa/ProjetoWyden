@@ -4,101 +4,91 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter @Setter
 public class Ocorrencia {
-    // Enums para status e prioridade (adicionados como inner classes)
+
+
+    @Getter
     public enum Status {
-        ABERTO, EM_ANDAMENTO, FECHADO
+        ABERTO("Em Aberto"),
+        EM_ANDAMENTO("Em Andamento"),
+        FECHADO("Fechado");
+
+        private final String descricao;
+        Status(String descricao) { this.descricao = descricao; }
     }
 
     public enum Prioridade {
         BAIXA, MEDIA, ALTA, URGENTE
     }
 
-    @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
-    @Setter
-    @NotBlank(message = "O título é obrigatório")
-    @Size(max = 200)
+    @NotBlank @Size(max = 200)
     @Column(nullable = false)
     private String titulo;
 
-    @Getter
-    @Setter
-    @NotBlank(message = "A descrição é obrigatória")
+    @NotBlank
     @Column(columnDefinition = "TEXT", nullable = false)
     private String descricao;
 
-    @Getter
-    @Setter
     @NotNull
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataAbertura;
 
-    @Getter
     @Column
     private LocalDateTime dataFechamento;
 
-    @Getter
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
-    @Getter
-    @Setter
+    @NotNull
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Prioridade prioridade;
 
-    @Getter
-    @Setter
     @NotNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Cadastro usuario;
 
-    @Getter
-    @Setter
     @OneToMany(mappedBy = "ocorrencia", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comentario> comentarios;
+    private List<Comentario> comentarios = new ArrayList<>();
 
-
-    // Construtor que inicializa valores padrão
-    public Ocorrencia() {
+    @PrePersist
+    protected void onCreate() {
         this.dataAbertura = LocalDateTime.now();
         this.status = Status.ABERTO;
     }
 
-    /*
-       Método para fechar um chamado
-    */
-    public void fecharChamado() {
-        this.status = Status.FECHADO;
-        this.dataFechamento = LocalDateTime.now();
-    }
+    // Getters e Setters
+    @Transient
+    private String dataFormatada;
 
-    /**
-     * Método para reabrir um chamado
-     */
-    public void reabrirChamado() {
-        this.status = Status.ABERTO;
-        this.dataFechamento = null;
-    }
+    @Transient
+    private String dataFechamentoFormatada;
 
-
-    public void setDataFechamento(LocalDateTime dataFechamento) {
-        if (dataFechamento != null && dataFechamento.isBefore(this.dataAbertura)) {
-            throw new IllegalArgumentException("Data de fechamento inválida");
+    // Métodos de negócio
+    public void fechar() {
+        if (this.status != Status.FECHADO) {
+            this.status = Status.FECHADO;
+            this.dataFechamento = LocalDateTime.now();
         }
-        this.dataFechamento = dataFechamento;
+    }
+
+    public void reabrir() {
+        if (this.status == Status.FECHADO) {
+            this.status = Status.ABERTO;
+            this.dataFechamento = null;
+        }
     }
 }
