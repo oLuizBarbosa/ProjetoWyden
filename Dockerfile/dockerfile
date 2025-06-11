@@ -21,11 +21,12 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # 4. Copia apenas o JAR e migrations
-COPY --from=builder /app/target/*.jar app.jar
+COPY COPY --from=builder /app/target/catatau2-0.0.1-SNAPSHOT.jar /app/app.jar
 COPY --from=builder /app/target/classes/db/migration ./db/migration
 
 # 5. Configurações de runtime
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
