@@ -35,7 +35,7 @@ spring:
   security:  # Movido para dentro do mesmo bloco 'spring'
     user:
       name: ${ADMIN_USER:admin}
-      password: ${ADMIN_PASSWORD:senhaSegura123}
+      password: ${ADMIN_PASSWORD:admin123}
 
 # Configura��es do servidor (separado, pois � outro namespace)
 server:
