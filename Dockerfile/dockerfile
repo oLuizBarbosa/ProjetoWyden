@@ -1,24 +1,31 @@
-# Estágio de build
+# Build stage
 FROM maven:3.9-eclipse-temurin-21 AS builder
 
 WORKDIR /app
+
+# 1. Copia apenas o POM primeiro para cachear dependências
 COPY pom.xml .
-# Cache das dependências
 RUN mvn -B dependency:go-offline
 
+# 2. Copia o restante do código
 COPY src ./src
-RUN mvn -B clean package -DskipTests
 
-# Estágio final
+# 3. Build com configurações seguras
+RUN mvn -B clean package -DskipTests \
+    -Dmaven.test.skip=true \
+    -Dmaven.compile.fork=true \
+    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# Runtime stage
 FROM eclipse-temurin:21-jre
-
 WORKDIR /app
+
+# 4. Copia apenas o JAR e migrations
 COPY --from=builder /app/target/*.jar app.jar
 COPY --from=builder /app/target/classes/db/migration ./db/migration
 
-# Variáveis de ambiente (substituídas no deploy)
-ENV SPRING_DATASOURCE_URL=${DATABASE_URL}
-ENV SPRING_PROFILES_ACTIVE=prod
-
+# 5. Configurações de runtime
+ENV JAVA_OPTS="-Xmx512m -Xms256m"
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
