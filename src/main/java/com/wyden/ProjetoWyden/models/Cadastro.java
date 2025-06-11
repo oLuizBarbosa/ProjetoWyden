@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,33 +34,27 @@ public class Cadastro implements UserDetails, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank @Size(max = 100)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String nome;
 
-    @NotBlank @Email
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotBlank
     @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "ENUM('ADMIN','USER','SUPPORT')")
     private Role grupo;
 
-    @Size(min = 11, max = 11)
-    @Pattern(regexp = "\\d{11}", message = "Telefone deve conter 11 dígitos")
+    @Column(length = 11)
     private String telefone;
 
-    @Column(nullable = false)
     private boolean ativo = true;
-
-    @Column(nullable = false)
     private boolean bloqueado = false;
+
+    @Column(name = "data_criacao", updatable = false)
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
     // UserDetails methods
     @Override

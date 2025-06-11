@@ -31,32 +31,26 @@ public class Ocorrencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank @Size(max = 200)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String titulo;
 
-    @NotBlank
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String descricao;
 
-    @NotNull
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, name = "data_abertura")
     private LocalDateTime dataAbertura;
 
-    @Column
+    @Column(name = "data_fechamento")
     private LocalDateTime dataFechamento;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "ENUM('ABERTO','EM_ANDAMENTO','FECHADO')")
     private Status status;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "ENUM('BAIXA','MEDIA','ALTA','URGENTE')")
     private Prioridade prioridade;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Cadastro usuario;

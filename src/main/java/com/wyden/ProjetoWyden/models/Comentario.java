@@ -10,25 +10,21 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 public class Comentario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 500)
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String texto;
 
-    @Setter(AccessLevel.NONE)
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime dataCriacao;
+    @Column(nullable = false, name = "data_criacao", updatable = false)
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ocorrencia_id", nullable = false)
     private Ocorrencia ocorrencia;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Cadastro usuario;

@@ -1,4 +1,4 @@
-# Configurações gerais
+# Configuraï¿½ï¿½es consolidadas (sem duplicaï¿½ï¿½es)
 spring:
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
@@ -12,14 +12,19 @@ spring:
       connection-timeout: 30000
       maximum-pool-size: 5
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    clean-disabled: true
+
+
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: ${SHOW_SQL:false}
+      ddl-auto: validate # Crucial para Flyway!
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
 
   freemarker:
     cache: ${FREEMARKER_CACHE:false}
@@ -27,14 +32,13 @@ spring:
     settings:
       datetime_format: "dd/MM/yyyy HH:mm"
 
-# Configurações do servidor
+  security:  # Movido para dentro do mesmo bloco 'spring'
+    user:
+      name: ${ADMIN_USER:admin}
+      password: ${ADMIN_PASSWORD:senhaSegura123}
+
+# Configuraï¿½ï¿½es do servidor (separado, pois ï¿½ outro namespace)
 server:
   port: ${PORT:8080}
   servlet:
     context-path: /
-
-# Segurança básica (ajuste para produção!)
-  security:
-    user:
-      name: ${ADMIN_USER:admin}
-      password: ${ADMIN_PASSWORD:senhaSegura123}
